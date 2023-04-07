@@ -3,6 +3,7 @@ library(tidyr)
 library(stringr)
 library(corrplot)
 
+
 # OUTCOME VARIABLE
 imo = read.csv("/Users/szymon/Desktop/ekonometria/ekon projekt/project_data.csv")
 
@@ -28,6 +29,8 @@ sum(is.na(imo$total_score))
 
 imo$weeklyHours
 
+imo$schoolAge
+
 imo$total_score = as.numeric(as.character(imo$total_score)) 
 imo$rain = as.numeric(as.character(imo$rain)) 
 imo$labor = as.numeric(as.character(imo$labor)) 
@@ -38,6 +41,7 @@ imo$pop2023 = as.numeric(imo$pop2023)
 imo$googleall = as.numeric(imo$googleall)
 imo$google5y = as.numeric(imo$google5y)
 imo$google1y = as.numeric(imo$google1y)
+imo$schoolAge = as.numeric(imo$schoolAge)
 
 # REPLACING OR DROPPING NAs
 imo_median = imo %>% mutate(across(where(is.numeric), ~replace_na(., median(., na.rm=TRUE))))
@@ -111,6 +115,36 @@ cor.test(imo$logPop2023, imo$total_score)
 
 # ----------------------------
 #### SIMPLE LINEAR MODELS ####
+
+# SCHOOL AGE
+lmod = lm(total_score ~ schoolAge, imo)
+summary(lmod)
+plot(total_score ~ schoolAge, imo)
+abline(lmod)
+
+# GOV EDU SPENDING
+lmod = lm(total_score ~ GovEduSpendingMill, imo)
+summary(lmod)
+plot(total_score ~ GovEduSpendingMill, imo)
+abline(lmod)
+
+# LOG(GOV EDU SPENDING)
+lmod = lm(total_score ~ log(GovEduSpendingMill), imo)
+summary(lmod)
+plot(total_score ~ log(GovEduSpendingMill), imo)
+abline(lmod)
+
+# TEACHERS SALARY
+lmod = lm(total_score ~ teacherSalary, imo)
+summary(lmod)
+plot(total_score ~ teacherSalary, imo)
+abline(lmod)
+
+# TEACHERS COMPENSATION PERCCENTAGE
+lmod(total_score ~ teachersCompPerc, imo)
+summary(lmod)
+plot(total_score ~ teachersCompPerc, imo)
+abline(lmod)
 
 
 # HAPPINESS
@@ -238,6 +272,20 @@ summary(mlmod)$adj.r.squared
 plot(mlmod)
 
 # MODEL 4 ### 
+mlmod = lm(total_score ~ iq + rain + log(GovEduSpendingMill), imo)
+summary(mlmod)
+summary(mlmod)$r.squared
+summary(mlmod)$adj.r.squared
+plot(mlmod)
+
+# MODEL 5 ### 
+mlmod = lm(total_score ~ schoolAge + iq + rain + logPop2023, imo)
+summary(mlmod)
+summary(mlmod)$r.squared
+summary(mlmod)$adj.r.squared
+plot(mlmod)
+
+# MODEL 6 ### 
 mlmod = lm(total_score ~  iq + rain + logPop2023 + log(spending), imo)
 summary(mlmod)
 summary(mlmod)$r.squared

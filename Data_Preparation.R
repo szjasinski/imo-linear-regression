@@ -15,7 +15,8 @@ iq = read.csv("/Users/szymon/Desktop/ekonometria/ekon projekt/datasets/iq popula
 googleall = read.csv("/Users/szymon/Desktop/ekonometria/ekon projekt/datasets/google trends mathematics all time.csv", header = FALSE)
 google5y = read.csv("/Users/szymon/Desktop/ekonometria/ekon projekt/datasets/google trends mathmatics 5 years.csv", header = FALSE)
 google1y = read.csv("/Users/szymon/Desktop/ekonometria/ekon projekt/datasets/google trends mathematics past year.csv", header = FALSE)
-
+education = read.csv("datasets/education_2015.csv")
+school_age = read.csv("datasets/school_age_2012.csv")
 
 head(imo_score)
 head(happy)
@@ -28,6 +29,9 @@ head(iq)
 head(googleall)
 head(google5y)
 head(google1y)
+head(education)
+head(school_age)
+
 
 
 # ------------------------
@@ -47,6 +51,8 @@ temp = temp[c("X.1", "X.2")]
 worked = worked[c("country", "weeklyHours")]
 military = military[c("country", "spending")]
 iq = iq[c("country", "iq")]
+education = education[,c(3,5,6,7)]
+school_age = school_age[,c(3,5)]
 
 # RENAMING COLUMNS
 names(rain)[1] = "country"
@@ -62,6 +68,12 @@ names(temp)[2] = "temp"
 names(googleall)[2] = "googleall"
 names(google5y)[2] = "google5y"
 names(google1y)[2] = "google1y"
+names(education)[1] = "country"
+names(education)[2] = "GovEduSpendingMill"
+names(education)[3] = "teachersCompPerc"
+names(education)[4] = "teacherSalary"
+names(school_age)[1] = "country"
+names(school_age)[2] = "schoolAge"
 
 
 # REMOVING LEADING WHITESPACES
@@ -70,6 +82,7 @@ labor[,c(1)]=trimws(str_trim(labor[,c(1)]))
 temp[,c(1)]=trimws(str_trim(temp[,c(1)]))
 
 str(rain)
+str(education)
 
 # STANDARDIZING COUNTRY NAMES 
 imo_score$country [imo_score$country == "Islamic Republic of Iran"] = "Iran"
@@ -91,7 +104,10 @@ google1y$country [google1y$country == "Czechia"] = "Czech Republic"
 google1y$country [google1y$country == "Türkiye"] = "Turkey"
 google1y$country [google1y$country == "Macao"] = "Macau"
 
-
+education$GovEduSpendingMill [education$GovEduSpendingMill == ".."] = NA
+education$teachersCompPerc [education$teachersCompPerc == ".."] = NA
+education$teacherSalary [education$teacherSalary == ".."] = NA
+school_age$schoolAge [school_age$schoolAge == ".."] = NA
 
 
 # MERGING DATAFRAMES INTO ONE
@@ -104,9 +120,12 @@ imo_6 = merge(x = imo_5, y = iq, by = "country", all.x = TRUE, all.y = FALSE)
 imo_7 = merge(x = imo_6, y = googleall, by = "country", all.x = TRUE, all.y = FALSE)
 imo_8 = merge(x = imo_7, y = google5y, by = "country", all.x = TRUE, all.y = FALSE)
 imo_9 = merge(x = imo_8, y = google1y, by = "country", all.x = TRUE, all.y = FALSE)
-imo = merge(x = imo_9, y = happy, by = "country", all.x = TRUE, all.y = FALSE)
+imo_10 = merge(x = imo_9, y = education, by = "country", all.x = TRUE, all.y = FALSE)
+imo_11 = merge(x = imo_10, y = school_age, by = "country", all.x = TRUE, all.y = FALSE)
 
-imo_7[!complete.cases(imo_7), ]
+imo = merge(x = imo_11, y = happy, by = "country", all.x = TRUE, all.y = FALSE)
+
+imo_x[!complete.cases(imo_x), ]
 
 
 # FIXING COLUMN FORMATTING SO ITS TYPE CAN BE CHANGED
@@ -126,7 +145,7 @@ imo$google5y = as.numeric(imo$google5y)
 imo$google1y = as.numeric(imo$google1y)
 
 str(imo)
-
+imo$teacherSalary
 # EXPORTING CSV
 write.csv(imo, "/Users/szymon/Desktop/ekonometria/ekon projekt/project_data.csv", row.names=FALSE)
 
